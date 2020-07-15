@@ -15,21 +15,22 @@ type SigninController struct {
 func (this *SigninController) Get() {
 	this.TplName = "signin.html"
 	this.Render()
-	fmt.Println("=||=signin get")
+	fmt.Println("=||= signin get")
 }
 func (this *SigninController) Post() {
 	usr := this.Input().Get("usr")
 	pwd := this.Input().Get("pwd")
-	fmt.Println("=||=usr:", usr, "\tpwd:", pwd)
+	fmt.Println("=||= usr:", usr, "\tpwd:", pwd)
 	//检查用户名和密码设置登录信息
 	if models.IsValidUsr(usr) && models.IsValidPwd(pwd) {
 		if models.VerifyPwd(usr, pwd) {
 			//添加登录信息
-			this.SetSession("Name", usr)
-			fmt.Println("Set Session!")
+			this.SetSession("Usr", usr)
+			//fmt.Println("Set Session!")
+			fmt.Println("=||= ", this.GetSession("Usr"))
 			this.Redirect("/profile", 302)
 		} else {
-			fmt.Println("Wrong Password!")
+			fmt.Println("=||= Wrong Password!")
 			this.Ctx.WriteString(`<script>alert("Incorrect user name or password!");</script>`)
 			this.TplName = "signin.html"
 			this.Render()
@@ -37,7 +38,7 @@ func (this *SigninController) Post() {
 		return
 	}
 	//登录失败
-	fmt.Println("login Failed!")
+	fmt.Println("=||= login Failed!")
 	this.Ctx.WriteString(`<script>alert("Login Failed!");</script>`)
 	this.TplName = "signin.html"
 	this.Render()
@@ -47,7 +48,7 @@ func (this *SigninController) Post() {
 	//("错误")
 }
 func (this *SigninController) Put() {
-	fmt.Println("=||=go to signup")
+	fmt.Println("=||= go to signup")
 	this.Redirect("/signup", 302)
 }
 func GoSignUp(ctx *context.Context) {
