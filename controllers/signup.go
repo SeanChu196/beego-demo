@@ -1,9 +1,9 @@
 package controllers
 
 import (
+	"beego-demo/models"
 	"fmt"
 
-	"../models"
 	"github.com/astaxie/beego"
 )
 
@@ -11,12 +11,13 @@ type SignupController struct {
 	beego.Controller
 }
 
-func (this *SignupController) Get() {
+func (this *SignupController) SignupGet() {
 	this.TplName = "signup.html"
 	this.Render()
 	fmt.Println("=||= signup get")
 }
-func (this *SignupController) Post() {
+
+func (this *SignupController) SignupPost() {
 	usr := this.Input().Get("usr")
 	pwd := this.Input().Get("pwd")
 	fmt.Println("=||= usr:", usr, "\tpwd:", pwd)

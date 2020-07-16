@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/lib/pq"
 )
@@ -15,7 +16,6 @@ var (
 	upperCaseRegexp *regexp.Regexp
 	lowerCaseRegexp *regexp.Regexp
 	numRegexp       *regexp.Regexp
-	//usrDict         map[string]string
 )
 
 type User struct {
@@ -25,10 +25,14 @@ type User struct {
 }
 
 func init() {
+	//初始化持久数据库
 	orm.RegisterModel(new(User))
 	// PostgreSQL 配置
 	orm.RegisterDriver("postgres", orm.DRPostgres) // 注册驱动
-	orm.RegisterDataBase("default", "postgres", "user=postgres password=asdf dbname=testUsr host=127.0.0.1 port=5432 sslmode=disable")
+	getCfg := beego.AppConfig.String
+	configStr := "user=" + getCfg("pgusr") + " password=" + getCfg("pgpassword") + " dbname=" + getCfg("pgdbname") + " host=" + getCfg("pghost") + " port=" + getCfg("pgport") + " sslmode=" + getCfg("pgsslmode")
+	//orm.RegisterDataBase("default", "postgres", "user=postgres password=asdf dbname=testUsr host=127.0.0.1 port=5432 sslmode=disable")
+	orm.RegisterDataBase("default", "postgres", configStr)
 	// 自动建表
 	orm.RunSyncdb("default", false, true)
 	orm.Debug = true
@@ -40,23 +44,9 @@ func init() {
 	upperCaseRegexp = regexp.MustCompile(`^(.*)[A-Z]+(.)*$`)
 	lowerCaseRegexp = regexp.MustCompile(`^(.*)[a-z]+().*$`)
 	numRegexp = regexp.MustCompile(`^(.)*[0-9]+(.)*$`)
-	//usrDict = make(map[string]string, 20)
-	//	usrDict["18018122236"] = "12345yutGH"
 }
 
-//func InsertUser(usr User) (int64, error) {
-//	return ORM.Insert(usr)
-//}
-//Use in this way:
-//stu := new(models.User)
-//stu.Usr = "15151768576"
-//stu.Pwd = "hi0JS865"
-//id, err := models.InsertUser(stu)
-//if err != nil {
-//	fmt.Println("Faile to create usr ", stu.Usr)
-//} else {
-//	fmt.Println("Id:", id, "\tusr:", stu.Usr)
-//}
+// InsertUser 将用户信息插入postgres数据库
 func InsertUser(usr, pwd string) (int64, error) {
 	var user User
 	user.Usr = usr
@@ -64,6 +54,8 @@ func InsertUser(usr, pwd string) (int64, error) {
 	//fmt.Println(ORM)
 	return ORM.Insert(&user)
 }
+
+// ReadUser 从数据库读取用户信息
 func ReadUser(usr *User, clo string) error {
 	return ORM.Read(usr, clo)
 }
